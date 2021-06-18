@@ -3,15 +3,18 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useCallback } from 'react';
 
-import { format, parseISO } from 'date-fns';
-import pt from 'date-fns/locale/pt-BR';
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
+import { useState } from 'react';
+import { useEffect } from 'react';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
+import { dateFormat } from '../utils/formatDates';
 
 interface Post {
   uid?: string;
@@ -33,11 +36,40 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
-  console.log(postsPagination);
+  const [posts, setPosts] = useState<PostPagination>({} as PostPagination);
 
-  const handleLoadPosts = useCallback(() => {
-    //
-  }, []);
+  useEffect(() => {
+    setPosts(postsPagination);
+  }, [postsPagination]);
+
+  const handleLoadPosts = useCallback(async () => {
+    try {
+      const response = await fetch(posts.next_page);
+      const { results, next_page } = await response.json();
+
+      const newPosts = results.map((newPost: Post) => {
+        return {
+          uid: newPost.uid,
+          first_publication_date: newPost.first_publication_date,
+          data: {
+            title: newPost.data.title,
+            subtitle: newPost.data.subtitle,
+            author: newPost.data.author,
+          },
+        };
+      });
+
+      setPosts(prevState => {
+        return {
+          results: [...prevState.results, ...newPosts],
+          next_page,
+        };
+      });
+    } catch (err) {
+      // eslint-disable-next-line
+      console.log(err);
+    }
+  }, [posts.next_page]);
 
   return (
     <>
@@ -51,28 +83,27 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
         </figure>
 
         <section className={styles.posts}>
-          {postsPagination &&
-            postsPagination.results.map(post => (
-              <Link key={post.uid} href={`/post/${post.uid}`}>
-                <article className={styles.post}>
-                  <h3 className={commonStyles.title}>{post.data.title}</h3>
-                  <p className={commonStyles.subtitle}>{post.data.subtitle}</p>
+          {posts?.results?.map(post => (
+            <Link key={post.uid} href={`/post/${post.uid}`}>
+              <article className={styles.post}>
+                <h3 className={commonStyles.title}>{post.data.title}</h3>
+                <p className={commonStyles.subtitle}>{post.data.subtitle}</p>
 
-                  <footer>
-                    <time className={commonStyles.createdAt}>
-                      <FiCalendar />
-                      <time>{post.first_publication_date}</time>
-                    </time>
-                    <span className={commonStyles.author}>
-                      <FiUser />
-                      {post.data.author}
-                    </span>
-                  </footer>
-                </article>
-              </Link>
-            ))}
+                <footer>
+                  <time className={commonStyles.createdAt}>
+                    <FiCalendar />
+                    {dateFormat(new Date(post.first_publication_date))}
+                  </time>
+                  <span className={commonStyles.author}>
+                    <FiUser />
+                    {post.data.author}
+                  </span>
+                </footer>
+              </article>
+            </Link>
+          ))}
 
-          {postsPagination && postsPagination.next_page !== null && (
+          {posts?.next_page !== null && (
             <button type="button" onClick={() => handleLoadPosts()}>
               Carregar mais posts
             </button>
@@ -89,18 +120,16 @@ export const getStaticProps: GetStaticProps = async () => {
   const response = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
-      pageSize: 1,
+      fetch: ['posts.title', 'posts.author', 'posts.subtitle'],
+      page: 1,
+      pageSize: 2,
     }
   );
 
   const posts = response.results.map(post => {
-    const datePost = parseISO(post.first_publication_date);
-    const dateFormatted = format(datePost, 'dd MMM yyyy', {
-      locale: pt,
-    });
     return {
       uid: post.uid,
-      first_publication_date: dateFormatted,
+      first_publication_date: post.first_publication_date,
       data: {
         title: post.data.title,
         subtitle: post.data.subtitle,
