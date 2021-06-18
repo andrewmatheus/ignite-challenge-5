@@ -1,5 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 
+import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
@@ -25,6 +26,25 @@ interface Post {
 interface PostProps {
   post: Post;
 }
+
+// function calculateEstimatedReadingTime(post: Post): number {
+//   const wordsPerMinute = 200;
+//   const wordsCount =
+//     RichText.asText(
+//       post.data.content.reduce((acc, data) => [...acc, ...data.body], [])
+//     ).split(' ').length +
+//     RichText.asText(
+//       post.data.content.reduce((acc, data) => {
+//         if (data.heading) {
+//           return [...acc, ...data.heading.split(' ')];
+//         }
+//         return [...acc];
+//       }, [])
+//     ).split(' ').length;
+
+//   const readingEstimatedTime = Math.ceil(wordsCount / wordsPerMinute);
+//   return readingEstimatedTime;
+// }
 
 // export default function Post() {
 //   // TODO

@@ -1,1 +1,61 @@
-// TODO
+.title {
+  color: var(--heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  line-height: 2.05rem;
+  margin-bottom: 0.5rem;
+ }
+
+.subtitle {
+  color: var(--body);
+  font-size: 1.125rem;
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.3rem;
+  margin-bottom: 1.5rem;
+}
+
+.createdAt {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-right: 1.5rem;
+
+  color: var(--info);
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.085rem;
+
+  svg {
+    width: 20px;
+    height: 20px;
+
+    color: var(--info);
+    margin-right: 8px;
+  }
+}
+
+.author {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+  color: var(--info);
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.085rem;
+
+  svg {
+    width: 20px;
+    height: 20px;
+
+    color: var(--info);
+    margin-right: 8px;
+  }
+}
