@@ -1,20 +1,16 @@
+import { useState, useCallback, useEffect } from 'react';
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useCallback } from 'react';
-
-import { format } from 'date-fns';
-import ptBR from 'date-fns/locale/pt-BR';
 
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
-import { useState } from 'react';
-import { useEffect } from 'react';
+
 import { getPrismicClient } from '../services/prismic';
+import { dateFormat } from '../utils/formatDates';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
-import { dateFormat } from '../utils/formatDates';
 
 interface Post {
   uid?: string;
@@ -74,7 +70,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
   return (
     <>
       <Head>
-        <title>Home</title>
+        <title>SpaceTraveling</title>
       </Head>
 
       <main className={styles.contentContainer}>
@@ -114,15 +110,18 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps<HomeProps> = async ({
+  preview = false,
+  previewData,
+}) => {
   const prismic = getPrismicClient();
 
   const response = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
       fetch: ['posts.title', 'posts.author', 'posts.subtitle'],
-      page: 1,
       pageSize: 2,
+      ref: previewData?.ref ?? null,
     }
   );
 

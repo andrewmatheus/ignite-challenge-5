@@ -1,1 +1,18 @@
-// TODO
+.headerContainer {
+  max-width: 1120px;
+  height: 100%;
+
+  overflow-y: auto;
+
+  margin: 0 auto;
+  padding: 2.5rem 2rem 2.425rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  img {
+    cursor: pointer;
+  }
+}
