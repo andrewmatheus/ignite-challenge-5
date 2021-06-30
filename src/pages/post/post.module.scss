@@ -36,8 +36,19 @@
       align-items: center;
 
       list-style: none;
+
+      margin-bottom: 1rem;
     }
   }
+}
+
+.timeUpdated {
+  color: var(--info);
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-style: italic;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.085rem;
 }
 
 .estimatedReadingTime {

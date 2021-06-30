@@ -6,7 +6,7 @@ export const dateFormat = (date: Date): string => {
 };
 
 export const dateHourFormat = (date: Date): string => {
-  return format(date, "'* editado em' dd MMM yyyy', às' H':'m", {
+  return format(date, "'* editado em' dd MMM yyyy', às' H':'mm", {
     locale: ptBR,
   });
 };

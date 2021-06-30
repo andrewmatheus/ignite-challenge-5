@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
 
+import { ExitPreviewButton } from '../components/ExitPreviewButton';
 import { getPrismicClient } from '../services/prismic';
 import { dateFormat } from '../utils/formatDates';
 
@@ -29,9 +30,13 @@ interface PostPagination {
 
 interface HomeProps {
   postsPagination: PostPagination;
+  preview: boolean;
 }
 
-export default function Home({ postsPagination }: HomeProps): JSX.Element {
+export default function Home({
+  postsPagination,
+  preview,
+}: HomeProps): JSX.Element {
   const [posts, setPosts] = useState<PostPagination>({} as PostPagination);
 
   useEffect(() => {
@@ -106,6 +111,8 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
           )}
         </section>
       </main>
+
+      {preview && <ExitPreviewButton />}
     </>
   );
 }
@@ -120,12 +127,15 @@ export const getStaticProps: GetStaticProps<HomeProps> = async ({
     [Prismic.predicates.at('document.type', 'posts')],
     {
       fetch: ['posts.title', 'posts.author', 'posts.subtitle'],
+      orderings: '[document.first_publication_date desc]',
       pageSize: 2,
       ref: previewData?.ref ?? null,
     }
   );
 
-  const posts = response.results.map(post => {
+  const { next_page, results } = response;
+
+  const posts: Post[] = results.map(post => {
     return {
       uid: post.uid,
       first_publication_date: post.first_publication_date,
@@ -138,14 +148,17 @@ export const getStaticProps: GetStaticProps<HomeProps> = async ({
   });
 
   const postsPagination = {
-    next_page: response.next_page,
+    next_page,
     results: posts,
   };
+
+  const timeToRevalidate = 60 * 3;
 
   return {
     props: {
       postsPagination,
+      preview,
     },
-    revalidate: 60 * 60 * 24,
+    revalidate: timeToRevalidate,
   };
 };
